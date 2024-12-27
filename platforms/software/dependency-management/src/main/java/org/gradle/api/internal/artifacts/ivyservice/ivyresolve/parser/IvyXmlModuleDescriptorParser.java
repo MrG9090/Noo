@@ -1345,24 +1345,23 @@ public class IvyXmlModuleDescriptorParser extends AbstractModuleDescriptorParser
 
         private static SAXParser newSAXParser(URL schema, InputStream schemaStream)
                 throws ParserConfigurationException, SAXException {
-            if (schema == null) {
-                SAXParserFactory parserFactory = XmlFactories.newSAXParserFactory();
-                parserFactory.setValidating(false);
-                parserFactory.setNamespaceAware(true);
-                SAXParser parser = parserFactory.newSAXParser();
-                parser.getXMLReader().setFeature(XML_NAMESPACE_PREFIXES, true);
-                return parser;
-            } else {
-                SAXParserFactory parserFactory = XmlFactories.newSAXParserFactory();
-                parserFactory.setValidating(true);
-                parserFactory.setNamespaceAware(true);
+            SAXParserFactory parserFactory = XmlFactories.newSAXParserFactory();
+            parserFactory.setNamespaceAware(true);
+            parserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            parserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            parserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 
-                SAXParser parser = parserFactory.newSAXParser();
+            if (schema != null) {
+                parserFactory.setValidating(true);
+            }
+
+            SAXParser parser = parserFactory.newSAXParser();
+            if (schema != null) {
                 parser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
                 parser.setProperty(JAXP_SCHEMA_SOURCE, schemaStream);
-                parser.getXMLReader().setFeature(XML_NAMESPACE_PREFIXES, true);
-                return parser;
             }
+            parser.getXMLReader().setFeature(XML_NAMESPACE_PREFIXES, true);
+            return parser;
         }
 
         public static void parse(
